@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLox", "SharpLox\SharpLox.csproj", "{996D2C1B-2F73-4DD0-AB3A-97CAF74C5A9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLoxTests", "SharpLoxTests\SharpLoxTests.csproj", "{7C5ED8FE-E072-43F4-9394-562738847F4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLoxCli", "SharpLoxCli\SharpLoxCli.csproj", "{0784DD7A-9B7A-473C-8DF0-5D5FBAD48C92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpLoxAstCodeGen", "SharpLoxAstCodeGen\SharpLoxAstCodeGen.csproj", "{67D7A68C-E260-4B54-A0EC-2D7418349DB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{996D2C1B-2F73-4DD0-AB3A-97CAF74C5A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{996D2C1B-2F73-4DD0-AB3A-97CAF74C5A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{996D2C1B-2F73-4DD0-AB3A-97CAF74C5A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{996D2C1B-2F73-4DD0-AB3A-97CAF74C5A9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C5ED8FE-E072-43F4-9394-562738847F4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C5ED8FE-E072-43F4-9394-562738847F4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C5ED8FE-E072-43F4-9394-562738847F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C5ED8FE-E072-43F4-9394-562738847F4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0784DD7A-9B7A-473C-8DF0-5D5FBAD48C92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0784DD7A-9B7A-473C-8DF0-5D5FBAD48C92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0784DD7A-9B7A-473C-8DF0-5D5FBAD48C92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0784DD7A-9B7A-473C-8DF0-5D5FBAD48C92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67D7A68C-E260-4B54-A0EC-2D7418349DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67D7A68C-E260-4B54-A0EC-2D7418349DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67D7A68C-E260-4B54-A0EC-2D7418349DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67D7A68C-E260-4B54-A0EC-2D7418349DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
