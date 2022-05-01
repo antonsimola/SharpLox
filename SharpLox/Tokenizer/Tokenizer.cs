@@ -29,7 +29,8 @@ public class Tokenizer
         { "this", THIS },
         { "true", TRUE },
         { "var", VAR },
-        { "while", WHILE }
+        { "while", WHILE },
+        { "break", BREAK }
     };
 
     public Tokenizer(string source)

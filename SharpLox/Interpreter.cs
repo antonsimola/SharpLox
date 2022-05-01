@@ -95,6 +95,21 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return literalexpression.Value;
     }
 
+    public object VisitLogicalExpression(LogicalExpression logicalexpression)
+    {
+        var left = Evaluate(logicalexpression.Left);
+        if (logicalexpression.Operator.Type == OR)
+        {
+            if (IsTruthy(left)) return left;
+        }
+        else
+        {
+            if (!IsTruthy(left)) return left;
+        }
+
+        return Evaluate(logicalexpression.Right);
+    }
+
     public object VisitUnaryExpression(UnaryExpression unaryexpression)
     {
         Object right = Evaluate(unaryexpression.Right);
@@ -171,6 +186,43 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitIfStatement(IfStatement ifstatement)
+    {
+        if(IsTruthy(Evaluate(ifstatement.Condition)))
+        {
+            Execute(ifstatement.ThenBranch);
+        } else if (ifstatement.ElseBranch != null)
+        {
+            Execute(ifstatement.ElseBranch);
+        }
+
+        return null;
+    }
+
+    public object VisitWhileStatement(WhileStatement whilestatement)
+    {
+        while (IsTruthy(Evaluate(whilestatement.Condition)))
+        {
+            try
+            {
+                Execute(whilestatement.Body);
+            }
+            catch (BreakException e)
+            {
+                break;
+                // ok, continue from the e exception
+            }
+            
+        }
+
+        return null;
+    }
+
+    public object VisitBreakStatement(BreakStatement breakstatement)
+    {
+        throw new BreakException();
+    }
+
     public object VisitPrintStatement(PrintStatement printstatement)
     {
         var obj = Evaluate(printstatement.Expression);
@@ -209,4 +261,8 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
             return obj.ToString();
         }
     }
+}
+
+public class BreakException : Exception
+{
 }

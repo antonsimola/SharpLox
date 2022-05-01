@@ -41,7 +41,14 @@ public class Environment
         if (_values.ContainsKey(name.Lexeme))
         {
             _values[name.Lexeme] = value;
+            return;
         }
+        
+        if (_enclosing != null)
+        {
+            _enclosing.Assign(name, value);
+            return;
+        } 
 
         throw new RuntimeException(name, $"Trying to set variable that does not exists {name.Lexeme}.");
     }

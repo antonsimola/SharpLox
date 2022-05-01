@@ -13,6 +13,7 @@ public class CodeGen
             "BinaryExpression   : Expression Left, Token Operator, Expression Right",
             "GroupingExpression : Expression Expression",
             "LiteralExpression  : object Value",
+            "LogicalExpression  : Expression Left, Token Operator, Expression Right",
             "UnaryExpression    : Token Token, Expression Right",
             "VariableExpression : Token Name"
         });
@@ -21,6 +22,9 @@ public class CodeGen
         {
             "BlockStatement         : List<Statement> Statements",
             "ExpressionStatement    : Expression Expression",
+            "IfStatement            : Expression Condition, Statement ThenBranch, Statement ElseBranch",
+            "WhileStatement         : Expression Condition, Statement Body",
+            "BreakStatement         : ",
             "PrintStatement         : Expression Expression",
             "VariableStatement      : Token Name, Expression Initializer"
         });

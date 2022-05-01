@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
-using System.Transactions;
 using NUnit.Framework;
 using SharpLox;
 using SharpLox.AbstractSyntaxTree;
@@ -168,15 +165,7 @@ public class Tests
 
         foreach (var (stmt, expect) in tests)
         {
-            var stringWriter = new StringWriter();
-            Console.SetOut(stringWriter);
-            var tokenizer = new Tokenizer(stmt);
-            var tokens = tokenizer.GetTokens();
-            var parser = new Parser(tokens);
-            var statements = parser.Parse();
-            var interpreter = new Interpreter();
-            interpreter.Interpret(statements);
-            Assert.AreEqual(expect, stringWriter.ToString().Trim(), stmt);
+            Assert.AreEqual(expect,RunCode(stmt), stmt);
         }
     }
 
@@ -191,15 +180,7 @@ public class Tests
 
         foreach (var (stmt, expect) in tests)
         {
-            var stringWriter = new StringWriter();
-            Console.SetOut(stringWriter);
-            var tokenizer = new Tokenizer(stmt);
-            var tokens = tokenizer.GetTokens();
-            var parser = new Parser(tokens);
-            var statements = parser.Parse();
-            var interpreter = new Interpreter();
-            interpreter.Interpret(statements);
-            Assert.AreEqual(expect, stringWriter.ToString().Trim(), stmt);
+            Assert.AreEqual(expect, RunCode(stmt), stmt);
         }
     }
 
@@ -227,12 +208,78 @@ public class Tests
         print b;
         print c;
 ";
-        var tokenizer = new Tokenizer(test);
+        Print(RunCode(test));
+        
+
+    }
+    [Test]
+    public void TestChapter9IfElse()
+    {
+        var test = @"
+            var a = 1;
+            if(a > 1) {print ""large"";} else {print ""small"";}
+            if(a == 1) {print ""1"";}
+";
+
+        var results = RunCode(test);
+        Assert.AreEqual("small\r\n1", results, test);
+        
+    }
+
+
+    [Test]
+    public void SimpleFibonacci()
+    {
+        var test = @"
+            var a = 0;
+            var temp ;
+
+            for (var b = 1; a < 10000; b = temp + b) {
+              print a;
+              temp = a;
+              a = b;
+            }";
+        Print(RunCode(test));
+        
+    }
+    
+    [Test]
+    public void TestSimpleBreak()
+    {
+        var test = @"
+            var a = 0;
+            var temp ;
+
+            while (a < 3) {
+              break;
+              print 2;
+              a = a + 1;
+            }
+            print 1;
+            ";
+        Assert.AreEqual("1", RunCode(test));
+        
+    }
+
+    public void Print(object any)
+    {
+        TestContext.Out.WriteLine(any);
+    }
+
+    private string RunCode(string code)
+    {
+        var stringWriter = new StringWriter();
+        Console.SetOut(stringWriter);
+        var tokenizer = new Tokenizer(code );
         var tokens = tokenizer.GetTokens();
         var parser = new Parser(tokens);
         var statements = parser.Parse();
         var interpreter = new Interpreter();
         interpreter.Interpret(statements);
-        
+        var result = stringWriter.ToString().Trim();
+        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+        standardOutput.AutoFlush = true;
+        Console.SetOut(standardOutput);
+        return result; 
     }
 }

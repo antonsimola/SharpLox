@@ -53,12 +53,94 @@ public class Parser
 
     private Statement Statement()
     {
-        
+        if (Match(IF)) return  IfStatement();
+        if (Match(WHILE)) return  WhileStatement();
+        if (Match(FOR)) return ForStatement();
         if (Match(PRINT)) return PrintStatement();
-        
+        if (Match(BREAK)) return BreakStatement();
+
         if (Match(LEFT_BRACE)) return  new BlockStatement(Block());
 
         return ExpressionStatement();
+    }
+
+
+    private BreakStatement BreakStatement()
+    {
+        Consume(SEMICOLON, "Expect ; after break ");
+        return new BreakStatement();
+    }
+    private Statement ForStatement()
+    {
+        Consume(LEFT_PAREN, "Expect '(' after 'for'.");
+        Statement initializer;
+        if (Match(SEMICOLON)) {
+            initializer = null;
+        } else if (Match(VAR)) {
+            initializer = VariableDeclaration();
+        } else {
+            initializer = ExpressionStatement();
+        }
+        
+        Expression condition = null;
+        if (!Check(SEMICOLON)) {
+            condition = Expression();
+        }
+        Consume(SEMICOLON, "Expect ';' after loop condition.");
+        
+        Expression increment = null;
+        if (!Check(RIGHT_PAREN)) {
+            increment = Expression();
+        }
+        Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+        Statement body = Statement();
+
+        if (increment != null)
+        {
+            body = new BlockStatement(
+                new List<Statement>()
+                {
+                    body,
+                    new ExpressionStatement(increment)
+                });
+
+        }
+        
+        if (condition == null) condition = new LiteralExpression(true);
+        body = new WhileStatement(condition, body);
+
+        if (initializer != null) {
+            body = new BlockStatement(new List<Statement>() { initializer, body });
+        }
+        
+        return body;
+        
+    }
+
+    private WhileStatement WhileStatement()
+    {
+        Consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expression condition = Expression();
+        Consume(RIGHT_PAREN, "Expect ')' after while condition.");
+        Statement statement = Statement();
+
+        return new WhileStatement(condition, statement);
+
+    }
+
+    private IfStatement IfStatement()
+    {
+        Consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expression condition = Expression();
+        Consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        
+        Statement thenBranch = Statement();
+        Statement elseBranch = null;
+        if (Match(ELSE)) {
+            elseBranch = Statement();
+        }
+
+        return new IfStatement(condition, thenBranch, elseBranch);
     }
 
     private List<Statement> Block()
@@ -94,7 +176,7 @@ public class Parser
 
     private Expression Assignment()
     {
-        Expression expr = Equality();
+        Expression expr = Or();
 
         if (Match(EQUAL)) {
             Token equals = Previous();
@@ -106,6 +188,31 @@ public class Parser
             }
 
             error(equals, "Invalid assignment target."); 
+        }
+
+        return expr;
+    }
+
+    private Expression Or()
+    {
+        Expression expr = And();
+        while (Match(OR)) {
+            Token oper = Previous();
+            Expression right = And();
+            expr = new LogicalExpression(expr, oper, right);
+        }
+
+        return expr;
+    }
+
+    private Expression And()
+    {
+        Expression expr = Equality();
+
+        while (Match(AND)) {
+            Token oper = Previous();
+            Expression right = Equality();
+            expr = new LogicalExpression(expr, oper, right);
         }
 
         return expr;
@@ -220,7 +327,7 @@ public class Parser
     private Exception error(Token token, String message)
     {
         Diagnostics.Error(token, message);
-        return new ParseException();
+        return new ParseException(token, message);
     }
 
     private bool Match(params TokenType[] types)
@@ -292,4 +399,17 @@ public class Parser
 
 public class ParseException : Exception
 {
+    private readonly Token _token;
+    private readonly string _message;
+
+    public ParseException(Token token, string message)
+    {
+        _token = token;
+        _message = message;
+    }
+
+    public override string ToString()
+    {
+        return _token.ToString() + " " + _message;
+    }
 }

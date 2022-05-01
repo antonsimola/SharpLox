@@ -11,6 +11,7 @@ public interface IVisitorExpression<out T> {
     T VisitBinaryExpression(BinaryExpression binaryexpression);
     T VisitGroupingExpression(GroupingExpression groupingexpression);
     T VisitLiteralExpression(LiteralExpression literalexpression);
+    T VisitLogicalExpression(LogicalExpression logicalexpression);
     T VisitUnaryExpression(UnaryExpression unaryexpression);
     T VisitVariableExpression(VariableExpression variableexpression);
     }
@@ -40,6 +41,13 @@ public record GroupingExpression(Expression Expression) : Expression {
 public record LiteralExpression(object Value) : Expression {
     public override T Accept<T>(IVisitorExpression<T> visitor) {
         return visitor.VisitLiteralExpression(this);
+    }
+}
+
+
+public record LogicalExpression(Expression Left, Token Operator, Expression Right) : Expression {
+    public override T Accept<T>(IVisitorExpression<T> visitor) {
+        return visitor.VisitLogicalExpression(this);
     }
 }
 
