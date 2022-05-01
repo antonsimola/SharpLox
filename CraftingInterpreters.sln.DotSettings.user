@@ -1,11 +1,20 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5fb6f340_002D99b0_002D4258_002D8224_002Dc6d2b3ac8fec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter7&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;And&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Variables&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+      &lt;Project Location="C:\Users\Anton\RiderProjects\CraftingInterpreters\SharpLoxTests" Presentation="&amp;lt;SharpLoxTests&amp;gt;" /&gt;&#xD;
+      &lt;Namespace&gt;SharpLoxTests&lt;/Namespace&gt;&#xD;
+    &lt;/And&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Scoping&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+  &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7a8ef997_002D5d2b_002D4779_002D82d3_002Db27420c93e74/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestChapter7" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter7&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Variables&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

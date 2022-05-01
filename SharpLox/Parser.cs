@@ -14,22 +14,101 @@ public class Parser
         _tokens = tokens;
     }
 
-    public Expression Parse()
+    public List<Statement> Parse()
     {
-        try
+        List<Statement> statements = new List<Statement>();
+        while (!IsAtEnd())
         {
-            return Expression();
+            statements.Add(Declaration());
         }
-        catch (ParseException e)
-        {
-            return null;
-        }
+
+        return statements;
     }
 
 
+    private Statement Declaration()
+    {
+        try {
+            if (Match(VAR)) return VariableDeclaration();
+
+            return Statement();
+        } catch (ParseException error) {
+            Synchronize();
+            return null;
+        }  
+    }
+
+    private Statement VariableDeclaration()
+    {
+        Token name = Consume(IDENTIFIER, "Expect variable name.");
+        
+        Expression initializer = null;
+        if (Match(EQUAL)) {
+            initializer = Expression();
+        }
+
+        Consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new VariableStatement(name, initializer);
+    }
+
+    private Statement Statement()
+    {
+        
+        if (Match(PRINT)) return PrintStatement();
+        
+        if (Match(LEFT_BRACE)) return  new BlockStatement(Block());
+
+        return ExpressionStatement();
+    }
+
+    private List<Statement> Block()
+    {
+        List<Statement> statements = new List<Statement>();
+
+        while (!Check(RIGHT_BRACE) && !IsAtEnd()) {
+            statements.Add(Declaration());
+        }
+
+       Consume(RIGHT_BRACE, "Expect '}' after block.");
+       return statements;
+    }
+
+    private PrintStatement PrintStatement()
+    {
+        Expression value = Expression();
+        Consume(SEMICOLON, "Expect ';' after value.");
+        return new PrintStatement(value);
+    }
+    
+    private ExpressionStatement ExpressionStatement()
+    {
+        Expression expr = Expression();
+        Consume(SEMICOLON, "Expect ';' after expression.");
+        return new ExpressionStatement(expr);
+    }
+
     private Expression Expression()
     {
-        return Equality();
+        return Assignment();
+    }
+
+    private Expression Assignment()
+    {
+        Expression expr = Equality();
+
+        if (Match(EQUAL)) {
+            Token equals = Previous();
+            Expression value = Assignment();
+
+            if (expr is VariableExpression ve) {
+                Token name = ve.Name;
+                return new AssignExpression(name, value);
+            }
+
+            error(equals, "Invalid assignment target."); 
+        }
+
+        return expr;
     }
 
     private Expression Equality()
@@ -116,6 +195,10 @@ public class Parser
             return new LiteralExpression(Previous().Literal);
         }
 
+        if (Match(IDENTIFIER))
+        {
+            return new VariableExpression(Previous());
+        }
 
         if (Match(LEFT_PAREN))
         {
@@ -180,13 +263,17 @@ public class Parser
     {
         return Peek().Type == EOF;
     }
-    private void Synchronize() {
+
+    private void Synchronize()
+    {
         Advance();
 
-        while (!IsAtEnd()) {
+        while (!IsAtEnd())
+        {
             if (Previous().Type == SEMICOLON) return;
 
-            switch (Peek().Type) {
+            switch (Peek().Type)
+            {
                 case CLASS:
                 case FUN:
                 case VAR:
@@ -201,7 +288,6 @@ public class Parser
             Advance();
         }
     }
-    
 }
 
 public class ParseException : Exception

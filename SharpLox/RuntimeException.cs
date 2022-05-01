@@ -4,6 +4,7 @@ public class RuntimeException: Exception
 {
     private readonly string _message;
     public Token Token { get; set; }
+    public string Name { get; set; }
 
     public RuntimeException(Token token, string message)
     {
@@ -11,9 +12,15 @@ public class RuntimeException: Exception
         _message = message;
     }
     
+    public RuntimeException(string name, string message)
+    {
+        Name = name;
+        _message = message;
+    }
+    
     public string GetMessage()
     {
-        return _message;
+        return Name + " " + _message;
     }
     
 }

@@ -9,10 +9,20 @@ public class CodeGen
         Console.WriteLine(Directory.GetCurrentDirectory());
         DefineAst("../../../../SharpLox/AbstractSyntaxTree/Expressions.cs", "Expression", new List<string>()
         {
+            "AssignExpression   : Token Name, Expression Value",
             "BinaryExpression   : Expression Left, Token Operator, Expression Right",
             "GroupingExpression : Expression Expression",
             "LiteralExpression  : object Value",
-            "UnaryExpression    : Token Token, Expression Right"
+            "UnaryExpression    : Token Token, Expression Right",
+            "VariableExpression : Token Name"
+        });
+        
+        DefineAst("../../../../SharpLox/AbstractSyntaxTree/Statement.cs", "Statement", new List<string>()
+        {
+            "BlockStatement         : List<Statement> Statements",
+            "ExpressionStatement    : Expression Expression",
+            "PrintStatement         : Expression Expression",
+            "VariableStatement      : Token Name, Expression Initializer"
         });
     }
 
@@ -22,7 +32,7 @@ public class CodeGen
         sb.AppendLine("namespace SharpLox.AbstractSyntaxTree;");
         sb.AppendLine("\n");
         sb.AppendLine($"public abstract record {baseType} {{");
-        sb.AppendLine($"public abstract T  Accept<T>(IVisitor<T> visitor);");
+        sb.AppendLine($"public abstract T  Accept<T>(IVisitor{baseType}<T> visitor);");
         
         sb.AppendLine($"}}");
         sb.AppendLine("\n");
@@ -42,7 +52,7 @@ public class CodeGen
 
     private static void DefineVisitor(StringBuilder sb, string baseType, IList<string> types)
     {
-        sb.AppendLine("public interface IVisitor<out T> {");
+        sb.AppendLine($"public interface IVisitor{baseType}<out T> {{");
 
         foreach (string type in types)
         {
@@ -57,7 +67,7 @@ public class CodeGen
     private static void DefineType(StringBuilder sb, string baseType, string typeName, string properties)
     {
         sb.AppendLine($"public record {typeName}({properties}) : {baseType} {{");
-        sb.AppendLine($"    public override T Accept<T>(IVisitor<T> visitor) {{");
+        sb.AppendLine($"    public override T Accept<T>(IVisitor{baseType}<T> visitor) {{");
         
         sb.AppendLine($"        return visitor.Visit{typeName}(this);");
         sb.AppendLine($"    }}");

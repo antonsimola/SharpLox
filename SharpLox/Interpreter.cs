@@ -1,22 +1,38 @@
-﻿using SharpLox.AbstractSyntaxTree;
+﻿using System.Globalization;
+using SharpLox.AbstractSyntaxTree;
 using static SharpLox.TokenType;
 
 namespace SharpLox;
 
-public class Interpreter : IVisitor<object>
+public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
 {
-    public object Interpret(Expression expression)
+    public  Environment Environment { get; set; } = new();
+    
+    public void Interpret(List<Statement> statements)
     {
         try
         {
-            Object value = Evaluate(expression);
-            return value;
+            foreach (var statement in statements)
+            {
+                Execute(statement);
+            }
         }
         catch (RuntimeException error)
         {
             Diagnostics.RuntimeError(error);
-            return null;
         }
+    }
+
+    private void Execute(Statement statement)
+    {
+        statement.Accept(this);
+    }
+
+    public object VisitAssignExpression(AssignExpression assignexpression)
+    {
+        var val = Evaluate(assignexpression.Value);
+        Environment.Assign(assignexpression.Name, val);
+        return val;
     }
 
     public object VisitBinaryExpression(BinaryExpression binaryexpression)
@@ -94,18 +110,25 @@ public class Interpreter : IVisitor<object>
 
         return null;
     }
-    
+
+    public object VisitVariableExpression(VariableExpression variableexpression)
+    {
+        return Environment.Get(variableexpression.Name.Lexeme);
+    }
+
     private void CheckNumberOperands(Token oper,
-        Object left, Object right) {
-        if (left is double  && right is double) return;
-    
+        Object left, Object right)
+    {
+        if (left is double && right is double) return;
+
         throw new RuntimeException(oper, "Operands must be numbers.");
     }
 
     private void CheckNumberOperand(Token oper,
-        Object obj) {
+        Object obj)
+    {
         if (obj is double) return;
-    
+
         throw new RuntimeException(oper, "Operand must be a number.");
     }
 
@@ -119,5 +142,71 @@ public class Interpreter : IVisitor<object>
     private Object Evaluate(Expression expr)
     {
         return expr.Accept(this);
+    }
+
+    public object VisitBlockStatement(BlockStatement blockstatement)
+    {
+        ExecuteBlock(blockstatement.Statements, new Environment(Environment));
+        return null;
+    }
+
+    private void ExecuteBlock(List<Statement> statements, Environment environment)
+    {
+        Environment previous = this.Environment;
+        try {
+            this.Environment = environment;
+
+            foreach (var  statement in statements) {
+                Execute(statement);
+            }
+        } finally {
+            this.Environment = previous;
+        }
+    }
+
+
+    public object VisitExpressionStatement(ExpressionStatement expressionstatement)
+    {
+        Evaluate(expressionstatement.Expression);
+        return null;
+    }
+
+    public object VisitPrintStatement(PrintStatement printstatement)
+    {
+        var obj = Evaluate(printstatement.Expression);
+        Console.WriteLine(Stringify(obj));
+        return null;
+    }
+
+    public object VisitVariableStatement(VariableStatement variablestatement)
+    {
+        object value = null;
+        if (variablestatement.Initializer != null)
+        {
+            value = Evaluate(variablestatement.Initializer);
+        }
+
+        Environment.Define(variablestatement.Name.Lexeme, value);
+        return null;
+    }
+
+    private string Stringify(object obj)
+    {
+        {
+            if (obj == null) return "nil";
+
+            if (obj is double d)
+            {
+                String text = d.ToString(CultureInfo.InvariantCulture);
+                if (text.EndsWith(".0"))
+                {
+                    text = text[0 .. (text.Length - 2)];
+                }
+
+                return text;
+            }
+
+            return obj.ToString();
+        }
     }
 }
