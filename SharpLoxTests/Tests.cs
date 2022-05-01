@@ -260,6 +260,26 @@ public class Tests
         Assert.AreEqual("1", RunCode(test));
         
     }
+    
+        
+    [Test]
+    public void TestSimpleBreakIf()
+    {
+        var test = @"
+            var a = 0;
+
+            while (true) {
+              if(a > 3)  {
+                break;
+              }
+            a = a +1;
+            }
+
+            print a;
+            ";
+        Assert.AreEqual("4", RunCode(test));
+        
+    }
 
     public void Print(object any)
     {

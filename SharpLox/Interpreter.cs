@@ -209,10 +209,10 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
             }
             catch (BreakException e)
             {
+                // ok, break from the loop
                 break;
-                // ok, continue from the e exception
             }
-            
+
         }
 
         return null;
@@ -263,6 +263,4 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
     }
 }
 
-public class BreakException : Exception
-{
-}
+public class BreakException : Exception { }

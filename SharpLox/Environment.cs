@@ -4,7 +4,7 @@ public class Environment
 {
     private readonly Environment? _enclosing;
 
-    private IDictionary<string, object> _values { get; set; } = new Dictionary<string, object>();
+    private IDictionary<string, object> _values = new Dictionary<string, object>();
 
 
     public Environment()
