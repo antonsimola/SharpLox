@@ -28,22 +28,26 @@ public class Parser
 
     private Statement Declaration()
     {
-        try {
+        try
+        {
             if (Match(VAR)) return VariableDeclaration();
 
             return Statement();
-        } catch (ParseException error) {
+        }
+        catch (ParseException error)
+        {
             Synchronize();
             return null;
-        }  
+        }
     }
 
     private Statement VariableDeclaration()
     {
         Token name = Consume(IDENTIFIER, "Expect variable name.");
-        
+
         Expression initializer = null;
-        if (Match(EQUAL)) {
+        if (Match(EQUAL))
+        {
             initializer = Expression();
         }
 
@@ -53,13 +57,13 @@ public class Parser
 
     private Statement Statement()
     {
-        if (Match(IF)) return  IfStatement();
-        if (Match(WHILE)) return  WhileStatement();
+        if (Match(IF)) return IfStatement();
+        if (Match(WHILE)) return WhileStatement();
         if (Match(FOR)) return ForStatement();
         if (Match(PRINT)) return PrintStatement();
         if (Match(BREAK)) return BreakStatement();
 
-        if (Match(LEFT_BRACE)) return  new BlockStatement(Block());
+        if (Match(LEFT_BRACE)) return new BlockStatement(Block());
 
         return ExpressionStatement();
     }
@@ -70,28 +74,38 @@ public class Parser
         Consume(SEMICOLON, "Expect ; after break ");
         return new BreakStatement();
     }
+
     private Statement ForStatement()
     {
         Consume(LEFT_PAREN, "Expect '(' after 'for'.");
         Statement initializer;
-        if (Match(SEMICOLON)) {
+        if (Match(SEMICOLON))
+        {
             initializer = null;
-        } else if (Match(VAR)) {
+        }
+        else if (Match(VAR))
+        {
             initializer = VariableDeclaration();
-        } else {
+        }
+        else
+        {
             initializer = ExpressionStatement();
         }
-        
+
         Expression condition = null;
-        if (!Check(SEMICOLON)) {
+        if (!Check(SEMICOLON))
+        {
             condition = Expression();
         }
+
         Consume(SEMICOLON, "Expect ';' after loop condition.");
-        
+
         Expression increment = null;
-        if (!Check(RIGHT_PAREN)) {
+        if (!Check(RIGHT_PAREN))
+        {
             increment = Expression();
         }
+
         Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
         Statement body = Statement();
 
@@ -103,18 +117,17 @@ public class Parser
                     body,
                     new ExpressionStatement(increment)
                 });
-
         }
-        
+
         if (condition == null) condition = new LiteralExpression(true);
         body = new WhileStatement(condition, body);
 
-        if (initializer != null) {
+        if (initializer != null)
+        {
             body = new BlockStatement(new List<Statement>() { initializer, body });
         }
-        
+
         return body;
-        
     }
 
     private WhileStatement WhileStatement()
@@ -125,7 +138,6 @@ public class Parser
         Statement statement = Statement();
 
         return new WhileStatement(condition, statement);
-
     }
 
     private IfStatement IfStatement()
@@ -133,10 +145,11 @@ public class Parser
         Consume(LEFT_PAREN, "Expect '(' after 'if'.");
         Expression condition = Expression();
         Consume(RIGHT_PAREN, "Expect ')' after if condition.");
-        
+
         Statement thenBranch = Statement();
         Statement elseBranch = null;
-        if (Match(ELSE)) {
+        if (Match(ELSE))
+        {
             elseBranch = Statement();
         }
 
@@ -147,12 +160,13 @@ public class Parser
     {
         List<Statement> statements = new List<Statement>();
 
-        while (!Check(RIGHT_BRACE) && !IsAtEnd()) {
+        while (!Check(RIGHT_BRACE) && !IsAtEnd())
+        {
             statements.Add(Declaration());
         }
 
-       Consume(RIGHT_BRACE, "Expect '}' after block.");
-       return statements;
+        Consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
     }
 
     private PrintStatement PrintStatement()
@@ -161,7 +175,7 @@ public class Parser
         Consume(SEMICOLON, "Expect ';' after value.");
         return new PrintStatement(value);
     }
-    
+
     private ExpressionStatement ExpressionStatement()
     {
         Expression expr = Expression();
@@ -178,16 +192,18 @@ public class Parser
     {
         Expression expr = Or();
 
-        if (Match(EQUAL)) {
+        if (Match(EQUAL))
+        {
             Token equals = Previous();
             Expression value = Assignment();
 
-            if (expr is VariableExpression ve) {
+            if (expr is VariableExpression ve)
+            {
                 Token name = ve.Name;
                 return new AssignExpression(name, value);
             }
 
-            error(equals, "Invalid assignment target."); 
+            error(equals, "Invalid assignment target.");
         }
 
         return expr;
@@ -196,7 +212,8 @@ public class Parser
     private Expression Or()
     {
         Expression expr = And();
-        while (Match(OR)) {
+        while (Match(OR))
+        {
             Token oper = Previous();
             Expression right = And();
             expr = new LogicalExpression(expr, oper, right);
@@ -209,7 +226,8 @@ public class Parser
     {
         Expression expr = Equality();
 
-        while (Match(AND)) {
+        while (Match(AND))
+        {
             Token oper = Previous();
             Expression right = Equality();
             expr = new LogicalExpression(expr, oper, right);
