@@ -30,15 +30,41 @@ public class Parser
     {
         try
         {
+            if (Match(FUN)) return FunctionDeclaration("function");
             if (Match(VAR)) return VariableDeclaration();
 
             return Statement();
         }
         catch (ParseException error)
         {
+            
             Synchronize();
             return null;
         }
+    }
+
+    private Statement FunctionDeclaration(string kind)
+    {
+        Token name = Consume(IDENTIFIER, $"Expect {kind} name.");
+        
+        Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+        List<Token> parameters = new List<Token>();
+        if (!Check(RIGHT_PAREN)) {
+            do {
+                if (parameters.Count >= 255) {
+                    error(Peek(), "Can't have more than 255 parameters.");
+                }
+
+                parameters.Add(
+                    Consume(IDENTIFIER, "Expect parameter name."));
+            } while (Match(COMMA));
+        }
+        Consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        
+       Consume(LEFT_BRACE, $"Expect '{{' before {kind} body.");
+       List<Statement> body = Block();
+       return new FunctionStatement(name, parameters, body);
     }
 
     private Statement VariableDeclaration()
@@ -60,12 +86,26 @@ public class Parser
         if (Match(IF)) return IfStatement();
         if (Match(WHILE)) return WhileStatement();
         if (Match(FOR)) return ForStatement();
+        if (Match(RETURN)) return ReturnStatement();
         if (Match(PRINT)) return PrintStatement();
         if (Match(BREAK)) return BreakStatement();
 
         if (Match(LEFT_BRACE)) return new BlockStatement(Block());
 
         return ExpressionStatement();
+    }
+
+    private Statement ReturnStatement()
+    {
+        var keyword = Previous();
+        Expression value = null;
+        if (!Check(SEMICOLON))
+        {
+            value = Expression();
+        }
+
+        Consume(SEMICOLON, "Expect ';' after return value.");
+        return new ReturnStatement(keyword, value);
     }
 
 
@@ -300,7 +340,42 @@ public class Parser
             return new UnaryExpression(oper, right);
         }
 
-        return Primary();
+        return Call();
+    }
+
+    private Expression Call()
+    {
+        Expression expression = Primary();
+        while (true)
+        {
+            if (Match(LEFT_PAREN))
+            {
+                expression = FinishCall(expression);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return expression;
+    }
+
+    private Expression FinishCall(Expression callee)
+    {
+        List<Expression> arguments = new List<Expression>();
+        if (!Check(RIGHT_PAREN)) {
+            do {
+                if (arguments.Count >= 255) {
+                    error(Peek(), "Can't have more than 255 arguments.");
+                }
+                arguments.Add(Expression());
+            } while (Match(COMMA));
+        }
+
+        Token paren = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new CallExpression(callee, paren, arguments);
     }
 
     private Expression Primary()

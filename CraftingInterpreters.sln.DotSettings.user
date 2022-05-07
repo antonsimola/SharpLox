@@ -19,7 +19,7 @@
     &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Variables&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=826e7e3a_002D8380_002D417b_002Da33f_002Db3f63f7e2800/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=826e7e3a_002D8380_002D417b_002Da33f_002Db3f63f7e2800/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Or&gt;&#xD;
     &lt;And&gt;&#xD;
       &lt;TestAncestor&gt;&#xD;
@@ -33,6 +33,34 @@
       &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter9IfElse&lt;/TestId&gt;&#xD;
       &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.SimpleFibonacci&lt;/TestId&gt;&#xD;
       &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestSimpleBreak&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestSimpleBreakIf&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestFunctions&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e392aa28_002D8a7e_002D47a2_002Db54b_002D0356ab7085d9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestFunctions" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestFunctions&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=eb325456_002Da8fd_002D4e3b_002D8bab_002D5d3625c5788f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;And&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Variables&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+      &lt;Project Location="C:\Users\Anton\RiderProjects\CraftingInterpreters\SharpLoxTests" Presentation="&amp;lt;SharpLoxTests&amp;gt;" /&gt;&#xD;
+      &lt;Namespace&gt;SharpLoxTests&lt;/Namespace&gt;&#xD;
+    &lt;/And&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter8Scoping&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter9IfElse&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.SimpleFibonacci&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestSimpleBreak&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestSimpleBreakIf&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestFunctions&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestFibonacci&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::7C5ED8FE-E072-43F4-9394-562738847F4F::net6.0::SharpLoxTests.Tests.TestChapter10Closure&lt;/TestId&gt;&#xD;
     &lt;/TestAncestor&gt;&#xD;
   &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

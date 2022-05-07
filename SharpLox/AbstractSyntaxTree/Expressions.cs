@@ -9,6 +9,7 @@ public abstract T  Accept<T>(IVisitorExpression<T> visitor);
 public interface IVisitorExpression<out T> {
     T VisitAssignExpression(AssignExpression assignexpression);
     T VisitBinaryExpression(BinaryExpression binaryexpression);
+    T VisitCallExpression(CallExpression callexpression);
     T VisitGroupingExpression(GroupingExpression groupingexpression);
     T VisitLiteralExpression(LiteralExpression literalexpression);
     T VisitLogicalExpression(LogicalExpression logicalexpression);
@@ -27,6 +28,13 @@ public record AssignExpression(Token Name, Expression Value) : Expression {
 public record BinaryExpression(Expression Left, Token Operator, Expression Right) : Expression {
     public override T Accept<T>(IVisitorExpression<T> visitor) {
         return visitor.VisitBinaryExpression(this);
+    }
+}
+
+
+public record CallExpression(Expression Callee, Token Paren, List<Expression> Arguments) : Expression {
+    public override T Accept<T>(IVisitorExpression<T> visitor) {
+        return visitor.VisitCallExpression(this);
     }
 }
 

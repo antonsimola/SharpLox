@@ -10,89 +10,6 @@ namespace SharpLoxTests;
 
 public class Tests
 {
-    // public class AstPrinter : IVisitorExpression<string>, IVisitorStatement<string>
-    // {
-    //     private String parenthesize(String name, params Expression[] exprs)
-    //     {
-    //         StringBuilder builder = new StringBuilder();
-    //
-    //         builder.Append("(").Append(name);
-    //         foreach (Expression expr in exprs)
-    //         {
-    //             builder.Append(" ");
-    //             builder.Append(expr.Accept(this));
-    //         }
-    //
-    //         builder.Append(")");
-    //
-    //         return builder.ToString();
-    //     }
-    //
-    //     public string VisitBinaryExpression(BinaryExpression binaryexpression)
-    //     {
-    //         return parenthesize(binaryexpression.Operator.Lexeme, binaryexpression.Left, binaryexpression.Right);
-    //     }
-    //
-    //     public string VisitGroupingExpression(GroupingExpression groupingexpression)
-    //     {
-    //         return parenthesize("group", groupingexpression.Expression);
-    //     }
-    //
-    //     public string VisitLiteralExpression(LiteralExpression literalexpression)
-    //     {
-    //         return literalexpression.Value?.ToString() ?? "nil";
-    //     }
-    //
-    //     public string VisitUnaryExpression(UnaryExpression unaryexpression)
-    //     {
-    //         return parenthesize(unaryexpression.Token.Lexeme, unaryexpression.Right);
-    //     }
-    //
-    //     public string VisitVariableExpression(VariableExpression variableexpression)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-    //
-    //     public string Print(Expression expression)
-    //     {
-    //         return expression.Accept(this);
-    //     }
-    //
-    //     public string VisitExpressionStatement(ExpressionStatement expressionstatement)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-    //
-    //     public string VisitPrintStatement(PrintStatement printstatement)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-    //
-    //     public string VisitVariableStatement(VariableStatement variablestatement)
-    //     {
-    //         throw new NotImplementedException();
-    //     }
-    // }
-
-    [SetUp]
-    public void Setup()
-    {
-    }
-
-    [Test]
-    public void TestChapter5()
-    {
-        Expression expression = new BinaryExpression(
-            new UnaryExpression(
-                new Token(TokenType.MINUS, "-", null, 1),
-                new LiteralExpression(123)),
-            new Token(TokenType.STAR, "*", null, 1),
-            new GroupingExpression(
-                new LiteralExpression(45.67)));
-
-        // Console.WriteLine(new AstPrinter().Print(expression));
-    }
-
     [Test]
     public void TestChapter6_1()
     {
@@ -165,7 +82,7 @@ public class Tests
 
         foreach (var (stmt, expect) in tests)
         {
-            Assert.AreEqual(expect,RunCode(stmt), stmt);
+            Assert.AreEqual(expect, RunCode(stmt), stmt);
         }
     }
 
@@ -209,9 +126,8 @@ public class Tests
         print c;
 ";
         Print(RunCode(test));
-        
-
     }
+
     [Test]
     public void TestChapter9IfElse()
     {
@@ -223,7 +139,6 @@ public class Tests
 
         var results = RunCode(test);
         Assert.AreEqual("small\r\n1", results, test);
-        
     }
 
 
@@ -240,9 +155,8 @@ public class Tests
               a = b;
             }";
         Print(RunCode(test));
-        
     }
-    
+
     [Test]
     public void TestSimpleBreak()
     {
@@ -258,10 +172,9 @@ public class Tests
             print 1;
             ";
         Assert.AreEqual("1", RunCode(test));
-        
     }
-    
-        
+
+
     [Test]
     public void TestSimpleBreakIf()
     {
@@ -278,7 +191,75 @@ public class Tests
             print a;
             ";
         Assert.AreEqual("4", RunCode(test));
+    }
+
+    [Test]
+    public void TestChapter10Functions()
+    {
+        var test = @"
+            fun sayHi(first, last) {
+                print ""Hi, "" + first + "" "" + last + ""!"";
+            }
+            
+            sayHi(""Anton"", ""Simola"");
+";
+        Assert.AreEqual("Hi, Anton Simola!", RunCode(test));
+    }
+
+    [Test]
+    public void TestChapter10Fibonacci()
+    {
+        var test = @"
+            fun fib(n) {
+              if (n <= 1) return n;
+              return fib(n - 2) + fib(n - 1);
+            }
+
+            for (var i = 0; i < 20; i = i + 1) {
+              print fib(i);
+        }";
+        Assert.AreEqual(@"0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+1597
+2584
+4181", RunCode(test));
+    }
+
+    [Test]
+    public void TestChapter10Closure()
+    {
+        var test = @"
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    print i;
+  }
+
+  return count;
+}
+
+var counter = makeCounter();
+counter();
+counter();
+";
         
+        Assert.AreEqual("1\r\n2", RunCode(test));
     }
 
     public void Print(object any)
@@ -290,7 +271,7 @@ public class Tests
     {
         var stringWriter = new StringWriter();
         Console.SetOut(stringWriter);
-        var tokenizer = new Tokenizer(code );
+        var tokenizer = new Tokenizer(code);
         var tokens = tokenizer.GetTokens();
         var parser = new Parser(tokens);
         var statements = parser.Parse();
@@ -300,6 +281,6 @@ public class Tests
         var standardOutput = new StreamWriter(Console.OpenStandardOutput());
         standardOutput.AutoFlush = true;
         Console.SetOut(standardOutput);
-        return result; 
+        return result;
     }
 }

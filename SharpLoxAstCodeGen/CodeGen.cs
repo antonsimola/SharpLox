@@ -11,6 +11,7 @@ public class CodeGen
         {
             "AssignExpression   : Token Name, Expression Value",
             "BinaryExpression   : Expression Left, Token Operator, Expression Right",
+            "CallExpression     : Expression Callee, Token Paren, List<Expression> Arguments",
             "GroupingExpression : Expression Expression",
             "LiteralExpression  : object Value",
             "LogicalExpression  : Expression Left, Token Operator, Expression Right",
@@ -22,7 +23,9 @@ public class CodeGen
         {
             "BlockStatement         : List<Statement> Statements",
             "ExpressionStatement    : Expression Expression",
+            "FunctionStatement      : Token Name, List<Token> Params, List<Statement> Body",
             "IfStatement            : Expression Condition, Statement ThenBranch, Statement ElseBranch",
+            "ReturnStatement        : Token Keyword, Expression Expression",
             "WhileStatement         : Expression Condition, Statement Body",
             "BreakStatement         : ",
             "PrintStatement         : Expression Expression",

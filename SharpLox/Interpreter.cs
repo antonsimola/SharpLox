@@ -6,8 +6,14 @@ namespace SharpLox;
 
 public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
 {
-    public  Environment Environment { get; set; } = new();
-    
+    public readonly Environment Globals = new();
+    public Environment Environment { get; set; }
+
+    public Interpreter()
+    {
+        Environment = Globals;
+    }
+
     public void Interpret(List<Statement> statements)
     {
         try
@@ -80,9 +86,36 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitCallExpression(CallExpression callexpression)
+    {
+        Object callee = Evaluate(callexpression.Callee);
+        List<Object> arguments = new List<object>();
+
+        foreach (Expression argument in callexpression.Arguments)
+        {
+            arguments.Add(Evaluate(argument));
+        }
+
+        if (callee is not ILoxCallable)
+        {
+            throw new RuntimeException(callexpression.Paren,
+                "Can only call functions and classes.");
+        }
+
+        ILoxCallable function = (ILoxCallable)callee;
+
+        if (function.Arity != arguments.Count)
+        {
+            throw new RuntimeException(callexpression.Paren,
+                $"Expected {function.Arity} arguments but got {arguments.Count}.");
+        }
+
+        return function.Call(this, arguments);
+    }
+
     private bool IsEqual(object? a, object? b)
     {
-        return object.Equals(a, b);
+        return Equals(a, b);
     }
 
     public object VisitGroupingExpression(GroupingExpression groupingexpression)
@@ -165,16 +198,20 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
-    private void ExecuteBlock(List<Statement> statements, Environment environment)
+    public void ExecuteBlock(List<Statement> statements, Environment environment)
     {
         Environment previous = this.Environment;
-        try {
+        try
+        {
             this.Environment = environment;
 
-            foreach (var  statement in statements) {
+            foreach (var statement in statements)
+            {
                 Execute(statement);
             }
-        } finally {
+        }
+        finally
+        {
             this.Environment = previous;
         }
     }
@@ -186,17 +223,33 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitFunctionStatement(FunctionStatement functionstatement)
+    {
+        LoxFunction function = new LoxFunction(functionstatement, Environment);
+        Environment.Define(functionstatement.Name.Lexeme, function);
+        return null;
+    }
+
     public object VisitIfStatement(IfStatement ifstatement)
     {
-        if(IsTruthy(Evaluate(ifstatement.Condition)))
+        if (IsTruthy(Evaluate(ifstatement.Condition)))
         {
             Execute(ifstatement.ThenBranch);
-        } else if (ifstatement.ElseBranch != null)
+        }
+        else if (ifstatement.ElseBranch != null)
         {
             Execute(ifstatement.ElseBranch);
         }
 
         return null;
+    }
+
+    public object VisitReturnStatement(ReturnStatement returnstatement)
+    {
+        object value = null;
+        if (returnstatement.Expression != null) value = Evaluate(returnstatement.Expression);
+
+        throw new ReturnException(value);
     }
 
     public object VisitWhileStatement(WhileStatement whilestatement)
@@ -212,7 +265,6 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
                 // ok, break from the loop
                 break;
             }
-
         }
 
         return null;
@@ -262,5 +314,3 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         }
     }
 }
-
-public class BreakException : Exception { }

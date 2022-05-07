@@ -9,7 +9,9 @@ public abstract T  Accept<T>(IVisitorStatement<T> visitor);
 public interface IVisitorStatement<out T> {
     T VisitBlockStatement(BlockStatement blockstatement);
     T VisitExpressionStatement(ExpressionStatement expressionstatement);
+    T VisitFunctionStatement(FunctionStatement functionstatement);
     T VisitIfStatement(IfStatement ifstatement);
+    T VisitReturnStatement(ReturnStatement returnstatement);
     T VisitWhileStatement(WhileStatement whilestatement);
     T VisitBreakStatement(BreakStatement breakstatement);
     T VisitPrintStatement(PrintStatement printstatement);
@@ -31,9 +33,23 @@ public record ExpressionStatement(Expression Expression) : Statement {
 }
 
 
+public record FunctionStatement(Token Name, List<Token> Params, List<Statement> Body) : Statement {
+    public override T Accept<T>(IVisitorStatement<T> visitor) {
+        return visitor.VisitFunctionStatement(this);
+    }
+}
+
+
 public record IfStatement(Expression Condition, Statement ThenBranch, Statement ElseBranch) : Statement {
     public override T Accept<T>(IVisitorStatement<T> visitor) {
         return visitor.VisitIfStatement(this);
+    }
+}
+
+
+public record ReturnStatement(Token Keyword, Expression Expression) : Statement {
+    public override T Accept<T>(IVisitorStatement<T> visitor) {
+        return visitor.VisitReturnStatement(this);
     }
 }
 
