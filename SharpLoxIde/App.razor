@@ -1,0 +1,70 @@
+﻿@using SharpLox
+@using SharpLox.Parser
+
+
+
+@foreach (var example in _examples)
+{
+    <button @onclick="e => OnSetExample(example)">@example.Key</button>
+}
+<MonacoEditor @ref="_editor" Id="editor" ConstructionOptions="EditorConstructionOptions"/>
+<button @onclick="RunCode">Run code</button>
+<p>@_result</p>
+
+
+@code {
+    private MonacoEditor _editor;
+    private string _result;
+    private IDictionary<string, string> _examples = new Dictionary<string, string>();
+
+
+    protected override void OnInitialized()
+    {
+        var fib = @"
+fun fib(a) {
+    if(a < 2) { 
+        return 1;
+    }
+    
+    return fib(a -1) + fib(a -2);    
+}
+
+for(var i = 0; i < 20; i = i + 1) {
+    print fib(i);
+}
+";
+        _examples = new Dictionary<string, string>() {{ "Fibonacci ", fib }};
+    }
+
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(MonacoEditor editor)
+    {
+        editor.SetValue(_examples.FirstOrDefault().Value);
+        return new StandaloneEditorConstructionOptions { AutomaticLayout = true, Language = "",};
+    }
+
+    private async Task RunCode()
+    {
+        var code = await _editor.GetValue();
+        var stringWriter = new StringWriter();
+        Console.SetOut(stringWriter);
+        var tokenizer = new Tokenizer(code);
+        var tokens = tokenizer.GetTokens();
+        var parser = new Parser(tokens);
+        var statements = parser.Parse();
+        var interpreter = new Interpreter();
+        interpreter.Interpret(statements);
+        var result = stringWriter.ToString().Trim();
+        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+        standardOutput.AutoFlush = true;
+        Console.SetOut(standardOutput);
+        _result = result;
+    }
+
+
+    private void OnSetExample(KeyValuePair<string, string> example)
+    {
+        _editor.SetValue(example.Value);
+    }
+
+}
