@@ -1,6 +1,6 @@
 ﻿using SharpLox.AbstractSyntaxTree;
 
-namespace SharpLox.Parser;
+namespace SharpLox;
 
 using static TokenType;
 

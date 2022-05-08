@@ -7,6 +7,7 @@ namespace SharpLox;
 public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
 {
     public readonly Environment Globals = new();
+    private  readonly  IDictionary<Expression, int> _locals = new Dictionary<Expression, int>();
     public Environment Environment { get; set; }
 
     public Interpreter()
@@ -37,7 +38,15 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
     public object VisitAssignExpression(AssignExpression assignexpression)
     {
         var val = Evaluate(assignexpression.Value);
-        Environment.Assign(assignexpression.Name, val);
+        if (_locals.TryGetValue(assignexpression, out var res))
+        {
+            Environment.AssignAt(res, assignexpression.Name, val);
+        }
+        else
+        {
+            Globals.Assign(assignexpression.Name, val);
+        }
+        
         return val;
     }
 
@@ -159,9 +168,20 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
-    public object VisitVariableExpression(VariableExpression variableexpression)
+    public object VisitVariableExpression(VariableExpression expr)
     {
-        return Environment.Get(variableexpression.Name.Lexeme);
+        return LookupVariable(expr.Name, expr);
+    }
+
+    private object LookupVariable(Token exprName, Expression expr)
+    {
+        if (_locals.TryGetValue(expr, out var res))
+        {
+            return Environment.GetAt(res, exprName.Lexeme);
+        }
+
+        return Globals.Get(exprName.Lexeme);
+        
     }
 
     private void CheckNumberOperands(Token oper,
@@ -312,5 +332,10 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
 
             return obj.ToString();
         }
+    }
+
+    public void Resolve(Expression expr, int depth)
+    {
+        _locals[expr] = depth;
     }
 }

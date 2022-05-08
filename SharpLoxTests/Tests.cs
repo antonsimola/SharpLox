@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
 using SharpLox;
-using SharpLox.AbstractSyntaxTree;
-using SharpLox.Parser;
 
 namespace SharpLoxTests;
 
@@ -258,7 +254,7 @@ var counter = makeCounter();
 counter();
 counter();
 ";
-        
+
         Assert.AreEqual("1\r\n2", RunCode(test));
     }
 
@@ -269,18 +265,7 @@ counter();
 
     private string RunCode(string code)
     {
-        var stringWriter = new StringWriter();
-        Console.SetOut(stringWriter);
-        var tokenizer = new Tokenizer(code);
-        var tokens = tokenizer.GetTokens();
-        var parser = new Parser(tokens);
-        var statements = parser.Parse();
-        var interpreter = new Interpreter();
-        interpreter.Interpret(statements);
-        var result = stringWriter.ToString().Trim();
-        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-        standardOutput.AutoFlush = true;
-        Console.SetOut(standardOutput);
-        return result;
+        var engine = new LoxScriptEngine();
+        return engine.Evaluate(code);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace SharpLox;
+﻿using SharpLox.AbstractSyntaxTree;
+
+namespace SharpLox;
 
 public class Environment
 {
@@ -51,5 +53,25 @@ public class Environment
         } 
 
         throw new RuntimeException(name, $"Trying to set variable that does not exists {name.Lexeme}.");
+    }
+
+    public object GetAt(int distance, string name)
+    {
+        return Ancestor(distance).Get(name);
+    }
+
+    private Environment Ancestor(int distance)
+    {
+        Environment environment = this;
+        for (int i = 0; i < distance; i++) {
+            environment = environment._enclosing; 
+        }
+
+        return environment;
+    }
+
+    public void AssignAt(int distance, Token token, object value )
+    {
+        Ancestor(distance).Assign(token, value);
     }
 }

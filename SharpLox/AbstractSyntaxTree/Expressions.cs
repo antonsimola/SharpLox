@@ -14,7 +14,7 @@ public interface IVisitorExpression<out T> {
     T VisitLiteralExpression(LiteralExpression literalexpression);
     T VisitLogicalExpression(LogicalExpression logicalexpression);
     T VisitUnaryExpression(UnaryExpression unaryexpression);
-    T VisitVariableExpression(VariableExpression variableexpression);
+    T VisitVariableExpression(VariableExpression expr);
     }
 
 

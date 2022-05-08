@@ -1,5 +1,4 @@
 ﻿@using SharpLox
-@using SharpLox.Parser
 
 
 
@@ -46,19 +45,8 @@ for(var i = 0; i < 20; i = i + 1) {
     private async Task RunCode()
     {
         var code = await _editor.GetValue();
-        var stringWriter = new StringWriter();
-        Console.SetOut(stringWriter);
-        var tokenizer = new Tokenizer(code);
-        var tokens = tokenizer.GetTokens();
-        var parser = new Parser(tokens);
-        var statements = parser.Parse();
-        var interpreter = new Interpreter();
-        interpreter.Interpret(statements);
-        var result = stringWriter.ToString().Trim();
-        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-        standardOutput.AutoFlush = true;
-        Console.SetOut(standardOutput);
-        _result = result;
+        var engine =new LoxScriptEngine();
+        _result = engine.Evaluate(code);
     }
 
 
