@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using SharpLox;
 
@@ -139,6 +140,29 @@ public class Tests
 
 
     [Test]
+    public void TestSimpleFor()
+    {
+        var test = @"
+var i = 0;
+for(; i < 10; i = i +1) print i;
+";
+        Assert.AreEqual(string.Join("\r\n", Enumerable.Range(0, 10)), RunCode(test));
+    }
+    
+    [Test]
+    public void TestSimpleWhile()
+    {
+        var test = @"
+var i = 0;
+while( i < 10) {
+    print i;
+    i = i + 1;
+}
+";
+        Assert.AreEqual(string.Join("\r\n", Enumerable.Range(0, 10)), RunCode(test));
+    }
+    
+    [Test]
     public void SimpleFibonacci()
     {
         var test = @"
@@ -207,7 +231,7 @@ public class Tests
     {
         var test = @"
             fun fib(n) {
-              if (n <= 1) return n;
+              if (n <= 1) {return n;}
               return fib(n - 2) + fib(n - 1);
             }
 
@@ -257,6 +281,29 @@ counter();
 
         Assert.AreEqual("1\r\n2", RunCode(test));
     }
+    
+    [Test]
+    public void TestChapter11Classes()
+    {
+        var test = @"
+class Person {
+    init(n) {
+        this.name = n;
+    }
+
+    sayHello() {
+        print ""Hello from "" + this.name;    
+    }
+}
+
+var bob = Person(""Bob"");
+
+bob.sayHello();
+";
+
+        Assert.AreEqual("Hello from Bob", RunCode(test));
+    }
+
 
     public void Print(object any)
     {

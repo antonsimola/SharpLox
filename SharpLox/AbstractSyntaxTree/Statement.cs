@@ -8,6 +8,7 @@ public abstract T  Accept<T>(IVisitorStatement<T> visitor);
 
 public interface IVisitorStatement<out T> {
     T VisitBlockStatement(BlockStatement blockstatement);
+    T VisitClassStatement(ClassStatement classstatement);
     T VisitExpressionStatement(ExpressionStatement expressionstatement);
     T VisitFunctionStatement(FunctionStatement functionstatement);
     T VisitIfStatement(IfStatement ifstatement);
@@ -22,6 +23,13 @@ public interface IVisitorStatement<out T> {
 public record BlockStatement(List<Statement> Statements) : Statement {
     public override T Accept<T>(IVisitorStatement<T> visitor) {
         return visitor.VisitBlockStatement(this);
+    }
+}
+
+
+public record ClassStatement(Token Name,  List<FunctionStatement> Methods) : Statement {
+    public override T Accept<T>(IVisitorStatement<T> visitor) {
+        return visitor.VisitClassStatement(this);
     }
 }
 

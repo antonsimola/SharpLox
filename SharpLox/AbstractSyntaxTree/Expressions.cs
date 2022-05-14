@@ -10,11 +10,14 @@ public interface IVisitorExpression<out T> {
     T VisitAssignExpression(AssignExpression assignexpression);
     T VisitBinaryExpression(BinaryExpression binaryexpression);
     T VisitCallExpression(CallExpression callexpression);
+    T VisitGetExpression(GetExpression getexpression);
     T VisitGroupingExpression(GroupingExpression groupingexpression);
     T VisitLiteralExpression(LiteralExpression literalexpression);
     T VisitLogicalExpression(LogicalExpression logicalexpression);
+    T VisitSetExpression(SetExpression setexpression);
+    T VisitThisExpression(ThisExpression thisexpression);
     T VisitUnaryExpression(UnaryExpression unaryexpression);
-    T VisitVariableExpression(VariableExpression expr);
+    T VisitVariableExpression(VariableExpression variableexpression);
     }
 
 
@@ -39,6 +42,13 @@ public record CallExpression(Expression Callee, Token Paren, List<Expression> Ar
 }
 
 
+public record GetExpression(Expression Object, Token Name) : Expression {
+    public override T Accept<T>(IVisitorExpression<T> visitor) {
+        return visitor.VisitGetExpression(this);
+    }
+}
+
+
 public record GroupingExpression(Expression Expression) : Expression {
     public override T Accept<T>(IVisitorExpression<T> visitor) {
         return visitor.VisitGroupingExpression(this);
@@ -56,6 +66,20 @@ public record LiteralExpression(object Value) : Expression {
 public record LogicalExpression(Expression Left, Token Operator, Expression Right) : Expression {
     public override T Accept<T>(IVisitorExpression<T> visitor) {
         return visitor.VisitLogicalExpression(this);
+    }
+}
+
+
+public record SetExpression(Expression Object, Token Name, Expression Value) : Expression {
+    public override T Accept<T>(IVisitorExpression<T> visitor) {
+        return visitor.VisitSetExpression(this);
+    }
+}
+
+
+public record ThisExpression(Token Keyword) : Expression {
+    public override T Accept<T>(IVisitorExpression<T> visitor) {
+        return visitor.VisitThisExpression(this);
     }
 }
 

@@ -30,6 +30,7 @@ public class Parser
     {
         try
         {
+            if (Match(CLASS)) return ClassDeclaration();
             if (Match(FUN)) return FunctionDeclaration("function");
             if (Match(VAR)) return VariableDeclaration();
 
@@ -37,22 +38,40 @@ public class Parser
         }
         catch (ParseException error)
         {
-            
             Synchronize();
             return null;
         }
     }
 
-    private Statement FunctionDeclaration(string kind)
+    private Statement ClassDeclaration()
+    {
+        Token name = Consume(IDENTIFIER, "Expect class name.");
+        Consume(LEFT_BRACE, "Expect '{' before class body.");
+
+        List<FunctionStatement> methods = new List<FunctionStatement>();
+        while (!Check(RIGHT_BRACE) && !IsAtEnd())
+        {
+            methods.Add(FunctionDeclaration("method"));
+        }
+
+        Consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+        return new ClassStatement(name, methods);
+    }
+
+    private FunctionStatement FunctionDeclaration(string kind)
     {
         Token name = Consume(IDENTIFIER, $"Expect {kind} name.");
-        
+
         Consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
 
         List<Token> parameters = new List<Token>();
-        if (!Check(RIGHT_PAREN)) {
-            do {
-                if (parameters.Count >= 255) {
+        if (!Check(RIGHT_PAREN))
+        {
+            do
+            {
+                if (parameters.Count >= 255)
+                {
                     error(Peek(), "Can't have more than 255 parameters.");
                 }
 
@@ -60,11 +79,12 @@ public class Parser
                     Consume(IDENTIFIER, "Expect parameter name."));
             } while (Match(COMMA));
         }
+
         Consume(RIGHT_PAREN, "Expect ')' after parameters.");
-        
-       Consume(LEFT_BRACE, $"Expect '{{' before {kind} body.");
-       List<Statement> body = Block();
-       return new FunctionStatement(name, parameters, body);
+
+        Consume(LEFT_BRACE, $"Expect '{{' before {kind} body.");
+        List<Statement> body = Block();
+        return new FunctionStatement(name, parameters, body);
     }
 
     private Statement VariableDeclaration()
@@ -89,7 +109,6 @@ public class Parser
         if (Match(RETURN)) return ReturnStatement();
         if (Match(PRINT)) return PrintStatement();
         if (Match(BREAK)) return BreakStatement();
-
         if (Match(LEFT_BRACE)) return new BlockStatement(Block());
 
         return ExpressionStatement();
@@ -242,6 +261,11 @@ public class Parser
                 Token name = ve.Name;
                 return new AssignExpression(name, value);
             }
+            
+            if (expr is GetExpression ge)
+            {
+                return new SetExpression(ge.Object, ge.Name, value);
+            }
 
             error(equals, "Invalid assignment target.");
         }
@@ -352,6 +376,11 @@ public class Parser
             {
                 expression = FinishCall(expression);
             }
+            else if (Match(DOT))
+            {
+                Token name = Consume(IDENTIFIER, "Expect property name after '.' .");
+                expression = new GetExpression(expression, name);
+            }
             else
             {
                 break;
@@ -364,11 +393,15 @@ public class Parser
     private Expression FinishCall(Expression callee)
     {
         List<Expression> arguments = new List<Expression>();
-        if (!Check(RIGHT_PAREN)) {
-            do {
-                if (arguments.Count >= 255) {
+        if (!Check(RIGHT_PAREN))
+        {
+            do
+            {
+                if (arguments.Count >= 255)
+                {
                     error(Peek(), "Can't have more than 255 arguments.");
                 }
+
                 arguments.Add(Expression());
             } while (Match(COMMA));
         }
@@ -389,6 +422,8 @@ public class Parser
         {
             return new LiteralExpression(true);
         }
+
+        if (Match(THIS)) return new ThisExpression(Previous());
 
         if (Match(NUMBER, STRING))
         {

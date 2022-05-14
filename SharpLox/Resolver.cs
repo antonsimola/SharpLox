@@ -11,8 +11,23 @@ namespace SharpLox;
 public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
 {
     private readonly Interpreter _interpreter;
-    private readonly Stack<IDictionary<String, Boolean>> _scopes = new();
+    private readonly List<IDictionary<String, Boolean>> _scopes = new();
 
+    public enum FunctionType
+    {
+        None,
+        Function,
+        Method,
+        Initializer
+    }
+    private enum ClassType
+    {
+        None,
+        Class
+    }
+
+    private FunctionType currentFunction = FunctionType.None;
+    private ClassType currentClass = ClassType.None;
 
     public Resolver(Interpreter interpreter)
     {
@@ -44,6 +59,12 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitGetExpression(GetExpression getexpression)
+    {
+        Resolve(getexpression.Object);
+        return null;
+    }
+
     public object VisitGroupingExpression(GroupingExpression groupingexpression)
     {
         Resolve(groupingexpression.Expression);
@@ -62,6 +83,24 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitSetExpression(SetExpression setexpression)
+    {
+        Resolve(setexpression.Value);
+        Resolve(setexpression.Object);
+        return null;
+    }
+
+    public object VisitThisExpression(ThisExpression thisexpression)
+    {
+        if (currentClass == ClassType.None) {
+            Diagnostics.Error(thisexpression.Keyword, "Can't use 'this' outside of a class.");
+            return null;
+        }
+        
+        ResolveLocal(thisexpression, thisexpression.Keyword);
+        return null;
+    }
+
     public object VisitUnaryExpression(UnaryExpression unaryexpression)
     {
         Resolve(unaryexpression.Right);
@@ -71,23 +110,22 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
     public object VisitVariableExpression(VariableExpression expr)
     {
         if (_scopes.Count > 0 &&
-             _scopes.Peek().ContainsKey(expr.Name.Lexeme) 
-            && 
-            _scopes.Peek()[expr.Name.Lexeme] == false)
+            _scopes[_scopes.Count-1].ContainsKey(expr.Name.Lexeme)
+            &&
+            _scopes[_scopes.Count-1][expr.Name.Lexeme] == false)
         {
-            Diagnostics.Error(expr.Name,   "Can't read local variable in its own initializer.");
+            Diagnostics.Error(expr.Name, "Can't read local variable in its own initializer.");
         }
-        
+
         ResolveLocal(expr, expr.Name);
         return null;
     }
 
     private void ResolveLocal(Expression expr, Token name)
     {
-
-        var scopeArray = _scopes.ToArray();
-        for (int i =scopeArray.Length - 1; i >= 0; i--) {
-            if (scopeArray[i].TryGetValue(name.Lexeme, out var x))
+        for (int i = _scopes.Count - 1; i >= 0; i--)
+        {
+            if (_scopes[i].ContainsKey(name.Lexeme))
             {
                 _interpreter.Resolve(expr, _scopes.Count - 1 - i);
                 return;
@@ -103,17 +141,41 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitClassStatement(ClassStatement classstatement)
+    {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.Class;
+        
+        Define(classstatement.Name);
+        BeginScope();
+        _scopes[_scopes.Count-1]["this"] = true;
+        foreach (FunctionStatement method in classstatement.Methods)
+        {
+            FunctionType declaration = FunctionType.Method;
+            if (method.Name.Lexeme == "init")
+            {
+                declaration = FunctionType.Initializer;
+            }
+            ResolveFunction(method, declaration);
+        }
+        
+        EndScope();
+
+        currentClass = enclosingClass;
+        return null;
+    }
+
     private void BeginScope()
     {
-        _scopes.Push(new Dictionary<string, bool>());
+        _scopes.Add(new Dictionary<string, bool>());
     }
 
     private void EndScope()
     {
-        _scopes.Pop();
+        _scopes.RemoveAt(_scopes.Count-1);
     }
 
-    public  void Resolve(List<Statement> blockstatementStatements)
+    public void Resolve(List<Statement> blockstatementStatements)
     {
         foreach (Statement statement in blockstatementStatements)
         {
@@ -143,44 +205,56 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
         Declare(functionstatement.Name);
         Define(functionstatement.Name);
 
-        ResolveFunction(functionstatement);
+        ResolveFunction(functionstatement, FunctionType.Function);
         return null;
     }
 
-    private void ResolveFunction(FunctionStatement functionstatement)
+    private void ResolveFunction(FunctionStatement functionstatement, FunctionType functionType)
     {
-        BeginScope();
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = functionType;
         
+        BeginScope();
         foreach (var param in functionstatement.Params)
         {
             Declare(param);
             Define(param);
         }
+
         Resolve(functionstatement.Body);
         EndScope();
+        currentFunction = enclosingFunction;
+
     }
 
     public object VisitIfStatement(IfStatement ifstatement)
     {
         Resolve(ifstatement.Condition);
         Resolve(ifstatement.ThenBranch);
-        
+
         if (ifstatement.ElseBranch != null) Resolve(ifstatement.ElseBranch);
         return null;
     }
 
     public object VisitReturnStatement(ReturnStatement returnstatement)
     {
-        if(returnstatement.Expression != null)
+        
+        if (returnstatement.Expression != null)
+        {
+            if (currentFunction == FunctionType.Initializer) {
+                Diagnostics.Error(returnstatement.Keyword, "Can't return a value from an initializer.");
+            }
             Resolve(returnstatement.Expression);
+        }
+            
 
         return null;
     }
 
     public object VisitWhileStatement(WhileStatement whilestatement)
     {
-        Resolve(whilestatement.Body);
         Resolve(whilestatement.Condition);
+        Resolve(whilestatement.Body);
         return null;
     }
 
@@ -192,8 +266,8 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
 
     public object VisitPrintStatement(PrintStatement printstatement)
     {
-            Resolve(printstatement.Expression);
-            return null;
+        Resolve(printstatement.Expression);
+        return null;
     }
 
     public object VisitVariableStatement(VariableStatement variablestatement)
@@ -215,7 +289,11 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
             return;
         }
 
-        var scope = _scopes.Peek();
+        var scope = _scopes[_scopes.Count -1];
+        
+        if (scope.ContainsKey(token.Lexeme)) {
+            Diagnostics.Error(token, "Already a variable with this name in this scope.");
+        }
         scope[token.Lexeme] = false;
     }
 
@@ -226,7 +304,8 @@ public class Resolver : IVisitorExpression<object>, IVisitorStatement<object>
             return;
         }
 
-        var scope = _scopes.Peek();
+        var scope = _scopes[_scopes.Count - 1];
         scope[token.Lexeme] = true;
     }
 }
+

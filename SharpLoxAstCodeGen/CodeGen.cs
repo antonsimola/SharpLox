@@ -12,9 +12,12 @@ public class CodeGen
             "AssignExpression   : Token Name, Expression Value",
             "BinaryExpression   : Expression Left, Token Operator, Expression Right",
             "CallExpression     : Expression Callee, Token Paren, List<Expression> Arguments",
+            "GetExpression      : Expression Object, Token Name",
             "GroupingExpression : Expression Expression",
             "LiteralExpression  : object Value",
             "LogicalExpression  : Expression Left, Token Operator, Expression Right",
+            "SetExpression      : Expression Object, Token Name, Expression Value",
+            "ThisExpression     : Token Keyword",
             "UnaryExpression    : Token Token, Expression Right",
             "VariableExpression : Token Name"
         });
@@ -22,6 +25,7 @@ public class CodeGen
         DefineAst("../../../../SharpLox/AbstractSyntaxTree/Statement.cs", "Statement", new List<string>()
         {
             "BlockStatement         : List<Statement> Statements",
+            "ClassStatement         : Token Name,  List<FunctionStatement> Methods",
             "ExpressionStatement    : Expression Expression",
             "FunctionStatement      : Token Name, List<Token> Params, List<Statement> Body",
             "IfStatement            : Expression Condition, Statement ThenBranch, Statement ElseBranch",

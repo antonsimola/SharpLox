@@ -122,6 +122,16 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return function.Call(this, arguments);
     }
 
+    public object VisitGetExpression(GetExpression getexpression)
+    {
+        Object obj = Evaluate(getexpression.Object);
+        if (obj is  LoxInstance li) {
+            return li.Get(getexpression.Name);
+        }
+
+        throw new RuntimeException(getexpression.Name, "Only instances have properties.");
+    }
+
     private bool IsEqual(object? a, object? b)
     {
         return Equals(a, b);
@@ -152,6 +162,25 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return Evaluate(logicalexpression.Right);
     }
 
+    public object VisitSetExpression(SetExpression setexpression)
+    {
+        var obj = Evaluate(setexpression.Object);
+        if (obj is not LoxInstance)
+        {
+            throw new RuntimeException(setexpression.Name,
+                "Only instances have fields.");
+        }
+
+        var val = Evaluate(setexpression.Value);
+        ((LoxInstance)obj).Set(setexpression.Name, val);
+        return null;
+    }
+
+    public object VisitThisExpression(ThisExpression thisexpression)
+    {
+        return LookupVariable(thisexpression.Keyword, thisexpression);
+    }
+
     public object VisitUnaryExpression(UnaryExpression unaryexpression)
     {
         Object right = Evaluate(unaryexpression.Right);
@@ -173,14 +202,14 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return LookupVariable(expr.Name, expr);
     }
 
-    private object LookupVariable(Token exprName, Expression expr)
+    private object LookupVariable(Token name, Expression expr)
     {
         if (_locals.TryGetValue(expr, out var res))
         {
-            return Environment.GetAt(res, exprName.Lexeme);
+            return Environment.GetAt(res, name.Lexeme);
         }
 
-        return Globals.Get(exprName.Lexeme);
+        return Globals.Get(name.Lexeme);
         
     }
 
@@ -218,6 +247,24 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
         return null;
     }
 
+    public object VisitClassStatement(ClassStatement classstatement)
+    {
+        Environment.Define(classstatement.Name.Lexeme,null);
+
+        Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
+        foreach (FunctionStatement method in classstatement.Methods)
+        {
+            LoxFunction function = new LoxFunction(method, Environment, method.Name.Lexeme == "init");
+            methods[method.Name.Lexeme] = function;
+        }
+
+
+        LoxClass klass = new LoxClass(classstatement.Name.Lexeme, methods);
+        
+        Environment.Assign(classstatement.Name, klass);
+        return klass;
+    }
+
     public void ExecuteBlock(List<Statement> statements, Environment environment)
     {
         Environment previous = this.Environment;
@@ -245,7 +292,7 @@ public class Interpreter : IVisitorExpression<object>, IVisitorStatement<object>
 
     public object VisitFunctionStatement(FunctionStatement functionstatement)
     {
-        LoxFunction function = new LoxFunction(functionstatement, Environment);
+        LoxFunction function = new LoxFunction(functionstatement, Environment, false);
         Environment.Define(functionstatement.Name.Lexeme, function);
         return null;
     }

@@ -57,7 +57,7 @@ public class Environment
 
     public object GetAt(int distance, string name)
     {
-        return Ancestor(distance).Get(name);
+        return Ancestor(distance)._values[name];
     }
 
     private Environment Ancestor(int distance)
@@ -72,6 +72,6 @@ public class Environment
 
     public void AssignAt(int distance, Token token, object value )
     {
-        Ancestor(distance).Assign(token, value);
+        Ancestor(distance)._values[token.Lexeme] = value;
     }
 }

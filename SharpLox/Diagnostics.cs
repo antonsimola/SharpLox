@@ -33,8 +33,8 @@ public class Diagnostics
 
     public static void RuntimeError(RuntimeException error)
     {
-        Console.Error.WriteLine(error.GetMessage() +
-                                "\n[line " + error.Token.Line + "]");
+        Console.Error.WriteLine(error?.GetMessage() +
+                                "\n[line " + error?.Token?.Line + "]");
         HadRuntimeError = true;
     }
 }
